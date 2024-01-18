@@ -1,122 +1,172 @@
-const Users = require("../model/userModel")
+const Users = require("../model/usermodel")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
-const createUser = async (req, res) => {
-    //step - 1 : Check if data is coming or not
+
+//*! Register logic
+const createUser = async (req,res) => {
+    //*step 1: Check if data is coming or not
     console.log(req.body);
 
-    //step - 2 : Destructure the data
-    const { firstName, lastName, email, password } = req.body;
+    //*Step 2: Destructure the data
+    const {firstName, lastName, email, password } = req.body;
+    
 
-    //step - 3 : Validate the incoming data
-    if (!firstName || !lastName || !email || !password) {
+    //*Step 3: validate the incoming data
+    if(!firstName || !lastName || !email || !password){
         return res.json({
             success: false,
-            message: 'Please enter all the fields.'
+            message: "Please enter all fields"
         })
     }
 
-    //step - 4 : making try catch block
-    try {
-        //step - 5 : check existing user 
-        const existingUser = await Users.findOne({ email: email })
-        if (existingUser) {
+    //*Step 4: try catch block
+    try{
+        //*step 5 : Check existing user
+        const existingUser = await Users.findOne({email : email})
+        if(existingUser){
             return res.json({
                 success: false,
-                message: 'User already exists.'
+                message: "User already exist"
             })
         }
 
-        //Encrypting password
+        //*password encryption
         const randomSalt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password, randomSalt)
 
-        //step - 6 : Create new user
+        //*step 6 : create new user
         const newUser = new Users({
-            //fieldname : incomming data name 
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            password: encryptedPassword,
+            firstName : firstName,
+            lastName : lastName,
+            email : email,
+            password : encryptedPassword,
+
         })
 
-        //step 7 : Save user and response 
         await newUser.save();
-        res.status(200).json({
+        res.json({
             success: true,
-            message: 'User Created Successfully.'
+            message: "User created successfully"
         })
 
-    } catch (error) {
+    }catch{
         res.status(500).json("Server Error")
     }
 
-
 }
-const loginUser = async(req, res) => {
-    //step 1 check incoming data
-    // res.send("Welcome to LOGIN USER API.")
-    console.log(req.body);
 
-    // destructing
-    const {email, password} = req.body;
 
-    // validation
+//*todo: login logic
+const loginUser =async (req,res) => {
+    //**for checking the postman
+    //*res.send("Welcome to LOGIN USER API.")
+
+    //* step 1: Check incoming data
+    console.log(req.body)
+
+    //*destructuring
+    const {email, password} =req.body;
+
+    //*validation
     if(!email || !password){
         return res.json({
-
             success: false,
-            message: "please enter all fields."
+            message: "Please enter all fields"
         })
     }
-    // try catch block
-    try {
-        // finding user
+
+    //*try catch block
+    try{
+        //*finding user
         const user = await Users.findOne({email: email})
         if(!user){
-           return res.json({
+            return res.json({
                 success: false,
-                message: "User does not exist."
+                message: "User does not exits"
             })
         }
-        // user exists
 
-        // comparing passsword
-        const databasepassword = user.password;
-        const isMatched = await bcrypt.compare(password,databasepassword);
-        if(!isMatched){
+        //*user exists: {FirstName, LastName, Email, Password} user.FirstName, user.LastName, user.password
+         //*comparing password
+
+         const databasePassword = user.password
+         const isMatch = await bcrypt.compare(password, databasePassword)
+         if(!isMatch){
             return res.json({
-                 success: false,
-                 message: "invalid Credentials."
-             })
-         }
-        // create token
-        const token = jwt.sign(
-            {id: user._id},
-            process.env.JWT_SECRET
-            
+                success: false,
+                message: "Invalid Credentails."
+            })
+        }
+
+        //*create token
+
+        const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET)
+
+        //*response
+        res.status(200).json({
+
+            success: true,
+            message: "User logged in successfully",
+            token: token,
+            userData: user
+        }
         )
 
-        // response
-        res.status(200).json({
-            success:true,
-            message: "User logged in sucessfully",
-            token : token,
-            userData : user
-        })
-        
-    } catch (error) {
+
+
+    }catch{
         res.json({
             success: false,
             message: "Server Error",
-            error: error
         })
-        
     }
-    
+
 }
 
-module.exports = {
-    createUser, loginUser
-}
+const changePassword = async (req, res) => {
+    try {
+      console.log(req.body);
+      const { oldPassword, newPassword, userId } = req.body;
+  
+      const user = await Users.findById(userId);
+  
+      if (!user) {
+        return res.json({
+          success: false,
+          message: "User not found",
+        });
+      }
+  
+      const isMatched = await bcrypt.compare(oldPassword, user.password);
+  
+      if (!isMatched) {
+        return res.json({
+          success: false,
+          message: "Old password is incorrect",
+        });
+      }
+  
+      const newHashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = newHashedPassword;
+      await user.save();
+  
+      res.json({
+        success: true,
+        message: "Password changed successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Server Error",
+        error: error.message,
+      });
+    }
+  };
+  
+  module.exports = {
+    createUser,
+    loginUser,
+    changePassword,
+  };

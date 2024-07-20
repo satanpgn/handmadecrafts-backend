@@ -1,22 +1,58 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
+// const productSchema = new mongoose.Schema({
+//     productName :{
+//         type : String,
+//         required : true,
+//         trim : true,
+//     },
+//     productPrice :{
+//         type : Number,
+//         required : true,
+//         trim : true,
+//     },
+//     productDescription :{
+//         type : String,
+//         required : true,
+//         trim : true,
+//     },
+//     productCategory :{
+//         type : String,
+//         required : true,
+//         trim : true,
+//     },
+//     productImageUrl : {
+//         type : String,
+//         required : true,
+//     },
+//     createdAt :{
+//         type : Date,
+//         default : Date.now(),
+//     }
+
+// })
+
+// const Products = mongoose.model('products', productSchema);
+// module.exports = Products;
+
+const mongoose = require('mongoose');
+ 
 const productSchema = new mongoose.Schema({
-    productName :{
+    productName:{
         type : String,
         required : true,
         trim : true,
     },
-    productPrice :{
+    productPrice:{
         type : Number,
         required : true,
-        trim : true,
     },
-    productDescription :{
+    productDescription:{
         type : String,
         required : true,
         trim : true,
     },
-    productCategory :{
+    productCategory:{
         type : String,
         required : true,
         trim : true,
@@ -24,13 +60,10 @@ const productSchema = new mongoose.Schema({
     productImageUrl : {
         type : String,
         required : true,
-    },
-    createdAt :{
-        type : Date,
-        default : Date.now(),
+        trim : true,
     }
-
+ 
 })
-
+ 
 const Products = mongoose.model('products', productSchema);
 module.exports = Products;

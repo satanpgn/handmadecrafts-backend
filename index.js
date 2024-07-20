@@ -16,9 +16,9 @@ dotenv.config();
 
           
 cloudinary.config({ 
-  cloud_name: process.env.CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: 'dx5g3awwp', 
+  api_key: '655191446113931', 
+  api_secret: 'gwawBXdmtX5dxWJALfDIKLp5dp8'
 });
 
 app.use(acceptMultimedia())
@@ -51,6 +51,11 @@ app.use('/api/user', require('./routes/userroutes'))
 // CREATE A ROUTE FOR PRODUCTS
 app.use("/api/product", require("./routes/productRoutes"))
 
+app.use('/api', require("./routes/productRoutes"));
+
+
+// app.use("/api/product", require)
+
 
 // defining port
 const PORT = process.env.PORT;
@@ -62,4 +67,5 @@ app.listen(PORT, ()=>{
 
 // make a POST route in userRoutes.js
 // make a function for login and export it
-// test in postman
+// test in postman'
+module.exports=app;

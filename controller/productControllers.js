@@ -1,5 +1,6 @@
 const cloudinary = require("cloudinary");
 const Products = require("../model/productModel")
+const SaleProduct = require('../model/salesProductModal')
 
 const createProduct = async (req,res) => {
     // step 1 : check incomming data
@@ -13,7 +14,9 @@ const createProduct = async (req,res) => {
         productDescription,
         productCategory,
     } = req.body;
+    console.log("below text")
     const {productImage} = req.files;
+    console.log("below file")
 
     // step 3 : Validate data
     if(!productName || !productPrice || !productDescription || !productCategory || !productImage){
@@ -51,6 +54,7 @@ const createProduct = async (req,res) => {
 
         
     } catch (error) {
+        console.log(error)
         res.status(500).json({
             success : false,
             message : "Internal server error"
@@ -66,7 +70,7 @@ const getProducts = async (req,res) => {
         const allProducts = await Products.find({});
         res.json({
             success : true,
-            message : "All products fetched successfully!",
+            message : "Products fetched successfully",
             products : allProducts
         })
         
@@ -195,6 +199,87 @@ const deleteProduct = async (req,res) =>{
         })
     }
 }
+const getAllProducts = async (req, res) => {
+    try {
+      const listOfProducts = await Products.find();
+      res.json({
+        success: true,
+        message: "Products fetched successfully",
+        products: listOfProducts,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json("Server Error");
+    }
+  };
+
+
+//   for sale product
+
+const createSaleProduct = async (req, res) => {
+    console.log(req.body);
+    console.log(req.files);
+
+    // step 2 : Destructuring data
+    const {
+        saleProductName, 
+        saleProductPrice,
+        saleDiscount,
+        saleRating,
+    } = req.body;
+    console.log("below text")
+    const {saleProductImage} = req.files;
+    console.log("below file")
+
+    // step 3 : Validate data
+    if(!saleProductName || !saleProductPrice || !saleDiscount || !saleRating || !saleProductImage ){
+        return res.json({
+            success : false,
+            message : "Please fill all the fields"
+        })
+    }
+    try {
+         // upload image to cloudinary
+         const uploadedImage = await cloudinary.v2.uploader.upload(
+            saleProductImage.path,
+            {
+                folder : "sales",
+                crop : "scale"
+            }
+        )
+
+        // Save to database
+        const newSalesProduct = new Products({
+            saleProductName : saleProductName,
+            saleProductPrice : saleProductPrice,
+            saleDiscount : saleDiscount,
+            saleRating : saleRating,
+            salePoductImage : uploadedImage.secure_url
+        })
+        await newSalesProduct.save();
+        res.json({
+            success : true,
+            message : "Sales Product created successfully",
+            product : newSalesProduct
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
+
+const getAllSaleProducts = async (req, res) => {
+    try {
+        const saleProducts = await SaleProduct.find();
+        res.json({
+            success : true,
+            message : "Sales Products fetched successfully",
+            products : saleProducts
+        })    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
 
 
 module.exports = {
@@ -202,5 +287,9 @@ module.exports = {
     getProducts,
     getSingleProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getAllProducts,
+    createSaleProduct,
+    getAllSaleProducts,
 }
+

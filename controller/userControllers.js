@@ -27,7 +27,7 @@ const createUser = async (req,res) => {
         if(existingUser){
             return res.json({
                 success: false,
-                message: "User already exist"
+                message: "User already exists."
             })
         }
 
@@ -47,7 +47,7 @@ const createUser = async (req,res) => {
         await newUser.save();
         res.json({
             success: true,
-            message: "User created successfully"
+            message: "User created successfully."
         })
 
     }catch{
@@ -83,7 +83,7 @@ const loginUser =async (req,res) => {
         if(!user){
             return res.json({
                 success: false,
-                message: "User does not exits"
+                message: "User already exists."
             })
         }
 
@@ -101,13 +101,13 @@ const loginUser =async (req,res) => {
 
         //*create token
 
-        const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET)
+        const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_TOKEN_SECRET)
 
         //*response
         res.status(200).json({
 
             success: true,
-            message: "User logged in successfully",
+            message: "User logged in successfully.",
             token: token,
             userData: user
         }
@@ -115,7 +115,8 @@ const loginUser =async (req,res) => {
 
 
 
-    }catch{
+    }catch(error){
+        console.log(error)
         res.json({
             success: false,
             message: "Server Error",

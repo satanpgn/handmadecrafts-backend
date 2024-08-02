@@ -56,7 +56,6 @@ const createUser = async (req,res) => {
 
 }
 
-
 //*todo: login logic
 const loginUser =async (req,res) => {
     //**for checking the postman

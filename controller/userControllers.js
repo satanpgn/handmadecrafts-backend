@@ -2,7 +2,6 @@ const Users = require("../model/usermodel")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
-
 //*! Register logic
 const createUser = async (req,res) => {
     //*step 1: Check if data is coming or not
@@ -11,7 +10,6 @@ const createUser = async (req,res) => {
     //*Step 2: Destructure the data
     const {firstName, lastName, email, password } = req.body;
     
-
     //*Step 3: validate the incoming data
     if(!firstName || !lastName || !email || !password){
         return res.json({
@@ -111,8 +109,6 @@ const loginUser =async (req,res) => {
             userData: user
         }
         )
-
-
 
     }catch(error){
         console.log(error)

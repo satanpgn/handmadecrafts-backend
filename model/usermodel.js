@@ -22,7 +22,21 @@ const userSchema = new mongoose.Schema({
     isAdmin:{
         type: Boolean,
         default: false,
-    }
+    },
+    passwordHistory: [String], 
+
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lastFailedLogin: {
+      type: Date,
+      default: null,
+    },
+    passwordLastChanged: {   // New field for tracking password change date
+      type: Date,
+      default: Date.now,
+    },
 })
 
 const User = mongoose.model('users',userSchema);
